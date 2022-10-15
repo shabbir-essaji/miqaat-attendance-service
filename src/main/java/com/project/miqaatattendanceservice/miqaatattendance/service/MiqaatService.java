@@ -112,4 +112,8 @@ public class MiqaatService {
         }
         return userWithActionDTOS;
     }
+
+    public void removeMiqaat(String miqaatId) {
+        miqaatRepository.deleteById(miqaatId);
+    }
 }

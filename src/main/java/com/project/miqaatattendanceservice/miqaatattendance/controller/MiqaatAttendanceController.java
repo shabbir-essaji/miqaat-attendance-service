@@ -26,14 +26,21 @@ public class MiqaatAttendanceController {
 
     @GetMapping("/miqaat")
     @ResponseBody
-    public ResponseEntity<List<MiqaatDTO>> getLiveMiqaat() {
+    public ResponseEntity<List<MiqaatDTO>> addMiqaat() {
         return ResponseEntity.ok(miqaatService.getLiveMiqaats());
     }
 
     @PostMapping("/miqaat/add")
     @ResponseBody
-    public ResponseEntity<MiqaatDTO> getLiveMiqaat(@RequestParam(value = "miqaatName") String miqaatName) {
+    public ResponseEntity<MiqaatDTO> addMiqaat(@RequestParam(value = "miqaatName") String miqaatName) {
         return ResponseEntity.ok(miqaatService.addMiqaat(miqaatName));
+    }
+
+    @PostMapping("/miqaat/remove")
+    @ResponseBody
+    public boolean removeMiqaat(@RequestParam(value = "miqaatId") String miqaatId) {
+        miqaatService.removeMiqaat(miqaatId);
+        return true;
     }
 
     @PostMapping(value = "/markAttendance", consumes = MediaType.APPLICATION_JSON_VALUE)
