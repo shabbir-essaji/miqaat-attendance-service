@@ -10,6 +10,7 @@ import com.project.miqaatattendanceservice.users.dto.UserWithActionDTO;
 import com.project.miqaatattendanceservice.users.service.UserService;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -40,14 +41,11 @@ public class MiqaatService {
         DashboardDTO dashboardDTO = new DashboardDTO();
         if (miqaat != null) {
             dashboardDTO.setMiqaatName(miqaat.getName());
-            Set<Integer> attendingITS = getSet(miqaat.getAttending());
-            Set<Integer> notAttendingITS = getSet(miqaat.getNotAttending());
-            Set<Integer> tentativeITS = getSet(miqaat.getTentative());
-            Set<UserDTO> attending = userService.getUsersById(attendingITS);
+            Set<UserDTO> attending = userService.getUsersById(miqaat.getAttending());
             dashboardDTO.setAttending(attending);
-            Set<UserDTO> notAttending = userService.getUsersById(notAttendingITS);
+            Set<UserDTO> notAttending = userService.getUsersById(miqaat.getNotAttending());
             dashboardDTO.setNotAttending(notAttending);
-            Set<UserDTO> tentative = userService.getUsersById(tentativeITS);
+            Set<UserDTO> tentative = userService.getUsersById(miqaat.getTentative());
             dashboardDTO.setTentative(tentative);
         }
         return dashboardDTO;
@@ -63,13 +61,14 @@ public class MiqaatService {
         return miqaats.stream().map(MiqaatDTO::new).collect(Collectors.toList());
     }
 
+    @Transactional
     public void markAttendance(AttendanceDTO attendanceDTO) {
         Optional<Miqaat> miqaatOptional = miqaatRepository.findById(attendanceDTO.getMiqaatId());
         if (miqaatOptional.isPresent()) {
             Miqaat miqaat = miqaatOptional.get();
-            Set<Integer> attending = getSet(attendanceDTO.getAttending());
-            Set<Integer> tentative = getSet(attendanceDTO.getTentative());
-            Set<Integer> notAttending = getSet(attendanceDTO.getNotAttending());
+            Set<Integer> attending = attendanceDTO.getAttending();
+            Set<Integer> tentative = attendanceDTO.getTentative();
+            Set<Integer> notAttending = attendanceDTO.getNotAttending();
             //remove all existing entries present in miqaat
             Set<Integer> ITSIds = new HashSet<>();
 
@@ -87,10 +86,6 @@ public class MiqaatService {
         }
     }
 
-    private Set<Integer> getSet(Set<Integer> set) {
-        return set == null ? new HashSet<>() : set;
-    }
-
     public Set<UserWithActionDTO> getMembersAttendance(Set<UserDTO> members, String miqaatId) {
         Miqaat miqaat = getMiqaat(miqaatId);
         Set<UserWithActionDTO> userWithActionDTOS = members.stream().map(member -> {
@@ -100,9 +95,9 @@ public class MiqaatService {
             return userWithActionDTO;
         }).collect(Collectors.toSet());
         if (miqaat != null) {
-            Set<Integer> attendingITS = getSet(miqaat.getAttending());
-            Set<Integer> notAttendingITS = getSet(miqaat.getNotAttending());
-            Set<Integer> tentativeITS = getSet(miqaat.getTentative());
+            Set<Integer> attendingITS = miqaat.getAttending();
+            Set<Integer> notAttendingITS = miqaat.getNotAttending();
+            Set<Integer> tentativeITS = miqaat.getTentative();
             userWithActionDTOS.forEach(userWithActionDTO -> {
                 if (attendingITS.contains(userWithActionDTO.getIts())) {
                     userWithActionDTO.setResponse(1);

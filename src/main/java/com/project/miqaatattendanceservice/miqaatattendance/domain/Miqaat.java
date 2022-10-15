@@ -1,5 +1,7 @@
 package com.project.miqaatattendanceservice.miqaatattendance.domain;
 
+import com.project.miqaatattendanceservice.Utils;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -44,5 +46,17 @@ public class Miqaat {
             this.tentative = new HashSet<>();
         }
         this.tentative.addAll(tentative);
+    }
+
+    public Set<Integer> getAttending() {
+        return Utils.checkGet(attending);
+    }
+
+    public Set<Integer> getNotAttending() {
+        return Utils.checkGet(notAttending);
+    }
+
+    public Set<Integer> getTentative() {
+        return Utils.checkGet(tentative);
     }
 }
