@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public void addUsers() {
+    public void addUsers(@RequestParam(value = "removeMiqaats", required = false, defaultValue = "false") boolean removeMiqaats) {
         try {
             List<User> ITSRecords = new ArrayList<>();
             ClassLoader classloader = Thread.currentThread().getContextClassLoader();
@@ -76,6 +76,9 @@ public class UserController {
                 ITSRecords.add(emp);
             }
             userService.removeExisting();
+            if (removeMiqaats) {
+                miqaatService.removeExistingMiqaat();
+            }
             userService.save(ITSRecords);
         }
         catch (Exception e) {

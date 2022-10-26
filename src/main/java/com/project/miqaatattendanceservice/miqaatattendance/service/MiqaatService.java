@@ -116,4 +116,8 @@ public class MiqaatService {
     public void removeMiqaat(String miqaatId) {
         miqaatRepository.deleteById(miqaatId);
     }
+
+    public void removeExistingMiqaat() {
+        miqaatRepository.deleteAll();
+    }
 }
